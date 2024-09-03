@@ -1,3 +1,5 @@
+import 'package:article_test/local_storage/data_mapper/article_mapper.dart';
+import 'package:article_test/local_storage/database.dart';
 import 'package:article_test/network/error_response.dart';
 import 'package:article_test/features/articles/data/dto/articles_dto.dart';
 import 'package:article_test/features/articles/domain/input_output/articles_output.dart';
@@ -10,14 +12,17 @@ class ArticleRepositoryImpl implements ArticleRepository {
   final NetworkInfo _networkInfo;
   final HttpClient _httpClient;
   final String _baseUrl;
+  final Database _localDatabase;
 
   ArticleRepositoryImpl({
     required HttpClient httpClient,
     required NetworkInfo networkInfo,
     required String baseUrl,
+    required Database localDatabase,
   })  : _httpClient = httpClient,
         _networkInfo = networkInfo,
-        _baseUrl = baseUrl;
+        _baseUrl = baseUrl,
+        _localDatabase = localDatabase;
 
   @override
   Future<ArticlesOutput> getArticles() async {
@@ -30,6 +35,10 @@ class ArticleRepositoryImpl implements ArticleRepository {
       if (response.isOk()) {
         final ArticlesDto articlesDto = ArticlesDto.fromJson(response.data);
 
+        await _localDatabase.deleteAllArticles();
+
+        await _localDatabase.insertArticles(articlesDto.toArticles());
+
         return ArticlesOutput(articlesList: articlesDto.toArticles());
       }
       ErrorResponse? errorResponse;
@@ -38,8 +47,15 @@ class ArticleRepositoryImpl implements ArticleRepository {
       } catch (_) {
         errorResponse = ErrorResponse(statusCode: response.statusCode, error: '', message: []);
       }
-      return ArticlesOutput(error: errorResponse);
+
+      final databaseArticles = await _localDatabase.getAllArticles();
+
+      return ArticlesOutput(articlesList: ArticleMapper.listToEntity(databaseArticles), error: errorResponse);
     }
-    return ArticlesOutput(error: ErrorResponse.noInternet());
+
+    final databaseArticles = await _localDatabase.getAllArticles();
+
+    return ArticlesOutput(
+        articlesList: ArticleMapper.listToEntity(databaseArticles), error: ErrorResponse.noInternet());
   }
 }

@@ -39,6 +39,7 @@ flutter run
 - **Architecture**: A clean architecture is used with separated layers to ensure maintainability and scalability.
 - **State and Data Management**: The BLoC pattern is used for state management and data flow.
 - **Error Handling**: A generic error class is implemented to handle possible API request failures.
+- **Offline Support**: The app uses Drift as the local database solution to store articles fetched from the Hacker News API. This allows the app to display articles even when there is no internet connection.
 
 ## Third-Party Libraries
 
@@ -48,3 +49,9 @@ flutter run
 - [get_it](https://pub.dev/packages/get_it) for dependency injection.
 - [equatable](https://pub.dev/packages/equatable) for value equality comparisons.
 - [intl](https://pub.dev/packages/intl) for internationalization and date formatting.
+- [drift](https://pub.dev/packages/drift) for local database management.
+- [sqlite3_flutter_libs](https://pub.dev/packages/sqlite3_flutter_libs) for SQLite support in Flutter.
+- [path_provider](https://pub.dev/packages/path_provider) for accessing local storage paths.
+- [path](https://pub.dev/packages/path) for manipulating file system paths.
+- [drift_dev](https://pub.dev/packages/drift_dev) for generating database-related code.
+- [build_runner](https://pub.dev/packages/build_runner) for code generation and build scripts.
